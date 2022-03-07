@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script>
+        /**
+         * 本地 数据版本的时间戳
+         * @type {number}
+         */
+      var localTs = 0;
+      $(function () {
+          var getData = function(){
+              var reqUrl = "/readdir";
+              if(localTs !== 0) {
+                  reqUrl += "?ts="+localTs;
+              }
+              $.get(reqUrl, function (result) {
+                  let target = document.querySelector("#content");
+                  if(result.refresh) {
+                      // 如果需要刷新则更新缓存
+                      localTs = result.ts;
+                      target.innerHTML = JSON.stringify(result.fileList, null, 2);
+                  }
+              })
+          };
+          getData();
+          setInterval(function () {
+            getData();
+          }, 10 * 1000);
+
+      });
+    </script>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <pre id = "content"></pre>
+  </body>
+</html>
